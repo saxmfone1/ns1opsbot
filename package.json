@@ -1,0 +1,9 @@
+{
+  "name": "ns1opsbot",
+  "version": "0.0.1",
+  "dependencies": {
+    "botkit": "^0.6.9",
+    "request": "^2.83.0",
+    "request-promise-native": "^1.0.5"
+  }
+}
