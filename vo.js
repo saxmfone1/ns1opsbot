@@ -32,30 +32,26 @@ class VO {
         let users = [];
         let pri_oncall_data = await this.get_primary_oncall_data();
         for (let schedule of pri_oncall_data.schedule){
-            if ('onCall' in schedule){
-                users.push(schedule.onCall)
-            }
-        }
-        for (let schedule of pri_oncall_data.schedule){
-            if ('overridOnCall' in schedule){
+            if ('overrideOnCall' in schedule){
                 users.push(schedule.overrideOnCall)
             }
-        }
-        //Uncomment for secondary oncall shift
-        /**
-         let sec_oncall_data = await this.get_secondary_oncall_data();
-         for (let schedule of sec_oncall_data.schedule){
-            if ('onCall' in schedule){
+            else if ('onCall' in schedule) {
                 users.push(schedule.onCall)
             }
         }
 
-        for (let schedule of sec_oncall_data.schedule){
-            if ('overridOnCall' in schedule){
+        //Uncomment for secondary oncall shift
+        /**
+         let sec_oncall_data = await this.get_secondary_oncall_data();
+         for (let schedule of sec_oncall_data.schedule){
+            if ('overrideOnCall' in schedule){
                 users.push(schedule.overrideOnCall)
             }
+            else if ('onCall' in schedule){
+                users.push(schedule.onCall)
+            }
         }
-        **/
+       **/
         return users;
     }
 

@@ -8,9 +8,24 @@ const config = JSON.parse(fs.readFileSync("config.json"));
 const slack = new Slack.Slack(config.oauth);
 const vo = new VO.VO(config.void, config.votoken);
 
+
+const winston = require('winston');
+const tsFormat = () => (new Date()).toLocaleTimeString();
+const logger = new (winston.Logger)({
+    transports: [
+        // colorize the output to the console
+        new (winston.transports.Console)({
+            timestamp: tsFormat,
+            colorize: true,
+        })
+    ]
+});
+logger.level = 'warning';
+
 const controller = Botkit.slackbot({
     debug: false,
-    require_delivery: true
+    require_delivery: true,
+    logger: logger
 });
 
 let bot = controller.spawn({

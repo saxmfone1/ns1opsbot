@@ -1,28 +1,36 @@
+const winston = require('winston');
+const tsFormat = () => (new Date()).toLocaleTimeString();
+const logger = new (winston.Logger)({
+    transports: [
+        // colorize the output to the console
+        new (winston.transports.Console)({
+            timestamp: tsFormat,
+            colorize: true,
+        })
+    ]
+});
+logger.level = 'info';
+
 module.exports = (controller, slack, vo) => {
-    // controller.hears(["^user list$"], ['direct_message'], async (bot, message) => {
-    //     try {
-    //         let user_list = await slack.print_users(bot);
-    //         let reply = "";
-    //         for (let user of user_list){
-    //             reply += user + "\n";
-    //         }
-    //         bot.reply(message, reply);
-    //     }
-    //     catch (err) {
-    //         bot.reply(message, "Sorry! Something went wrong: " + err);
-    //     }
-    // });
+    controller.hears(["thanks"], ['direct_message, direct_mention,mention'], async (bot, message) => {
+        logger.info("[" + await slack.get_username(bot, message.user) + "] " + message.match[0]);
+        bot.replyWithTyping(message, "Very good, sir.");
+    });
+
     controller.hears(["^slack oncall group list$"], ['direct_message,direct_mention,mention'], async (bot, message) => {
+        logger.info("[" + await slack.get_username(bot, message.user) + "] " + message.match[0]);
         bot.startTyping(message);
         try {
             let group_list = await slack.print_group_users(bot, 'oncall-ny');
             for (let group in group_list){
-                let reply = "@" + group + ":\n";
-                for (let user of group_list[group]){
-                    reply += "\t" + user + "\n";
-                }
+                if (group_list.hasOwnProperty(group)) {
+                    let reply = "@" + group + ":\n";
+                    for (let user of group_list[group]) {
+                        reply += "\t" + user + "\n";
+                    }
 
-                bot.reply(message, reply);
+                    bot.reply(message, reply);
+                }
             }
         }
         catch (err) {
@@ -31,6 +39,7 @@ module.exports = (controller, slack, vo) => {
     });
 
     controller.hears(["^(add|remove) (.*) (to|from) oncall$"], ['direct_message,direct_mention,mention'], async (bot, message) => {
+        logger.info("[" + await slack.get_username(bot, message.user) + "] " + message.match[0]);
         bot.startTyping(message);
         let action = message.match[1];
         let user = message.match[2];
@@ -45,22 +54,8 @@ module.exports = (controller, slack, vo) => {
         bot.reply(message, reply)
     });
 
-    // controller.hears(["email (.*)"], ['direct_message'], async (bot, message) => {
-    //     let email = message.match[1];
-    //     let reply = "";
-    //     try {
-    //         reply = await slack.lookup_userid_by_email(bot, email);
-    //     }
-    //     catch (err){
-    //         reply = "Could not find user";
-    //     }
-    //     if (reply === null){
-    //         reply = "Could not find user";
-    //     }
-    //     bot.reply(message, reply);
-    // });
-
-    controller.hears(["vo oncall group list"], ['direct_message,direct_mention,mention'], async (bot, message) => {
+    controller.hears(["who is on call"], ['direct_message,direct_mention,mention'], async (bot, message) => {
+        logger.info("[" + await slack.get_username(bot, message.user) + "] " + message.match[0]);
         bot.startTyping(message);
         let users, reply;
         try {
@@ -76,5 +71,13 @@ module.exports = (controller, slack, vo) => {
             reply += "\t" + user + " (" + await vo.lookup_email(user) + ")\n";
         }
         bot.reply(message, reply);
+    });
+
+    controller.hears([".*"], ['direct_message,direct_mention,mention'], async (bot, message) => {
+        logger.info("[" + await slack.get_username(bot, message.user) + "] " + message.match[0]);
+        bot.replyWithTyping(message, "I didn't quite understand you.\n" +
+            "Right now, you can ask me...\n" +
+            "`Who is on call?`\n" +
+            "`Add/Remove $user to/from oncall` - Note: This only affects the @oncall-ny Slack group, VO will not be changed...yet");
     })
 };

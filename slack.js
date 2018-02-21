@@ -49,15 +49,15 @@ function lookup_userid_by_username(username, user_data){
     return userid;
 }
 
-function lookup_username_by_email(email, user_data){
-    let username = null;
-    for (let user of user_data["members"]){
-        if (user.profile.email === email){
-            username = user.name;
-        }
-    }
-    return username;
-}
+// function lookup_username_by_email(email, user_data){
+//     let username = null;
+//     for (let user of user_data["members"]){
+//         if (user.profile.email === email){
+//             username = user.name;
+//         }
+//     }
+//     return username;
+// }
 
 function lookup_group_handle(groupid, group_data){
     let groupname = null;
@@ -128,6 +128,11 @@ class Slack {
             }
         }
         return userid;
+    }
+
+    async get_username(bot, userid){
+        let user_data = await this.get_user_data(bot);
+        return lookup_username(userid, user_data);
     }
 
     async get_groups_user_data(bot, usergroup){
@@ -326,31 +331,6 @@ class Slack {
         }
         return reply;
     }
-
-    async get_username(bot, userid){
-        let user_data = await this.get_user_data(bot);
-        let username = null;
-        for (let user of user_data["members"]){
-            if (user.id === userid){
-                username = user.name;
-            }
-        }
-        return username;
-    }
-
-    async get_groupname(bot, groupid){
-        let group_data = await this.get_group_data(bot);
-        let groupname = null;
-        for (let group of group_data["usergroups"]){
-            if (group.id === groupid){
-                groupname = group.handle;
-            }
-        }
-        return groupname;
-    }
-
-
-
 }
 
 module.exports = {
