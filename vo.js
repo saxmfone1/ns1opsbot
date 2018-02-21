@@ -1,7 +1,7 @@
 const request = require("request-promise-native");
 const vo_api_url = 'https://api.victorops.com/api-public/v1/';
-const primary = 'team/devops/oncall/schedule?daysForward=1&daysSkip=0&step=0';
-const secondary = 'team/devops-secondary/oncall/schedule?daysForward=1&daysSkip=0&step=0';
+const schedule_url = '/oncall/schedule?daysForward=1&daysSkip=0&step=0';
+// const secondary = 'team/devops-secondary/oncall/schedule?daysForward=1&daysSkip=0&step=0';
 
 
 class VO {
@@ -11,26 +11,37 @@ class VO {
             "X-VO-Api-Key": vo_token
         };
     }
-    async get_primary_oncall_data(){
+
+    async get_oncall_data(team){
         let options = {
-            url: vo_api_url + primary,
-            json: true,
-            headers: this.headers
-        };
-        return await request.get(options);
-    }
-    async get_secondary_oncall_data(){
-        let options = {
-            url: vo_api_url + secondary,
+            url: vo_api_url + "team/" + team + schedule_url,
             json: true,
             headers: this.headers
         };
         return await request.get(options);
     }
 
-    async get_current_oncall_users(){
+    // async get_primary_oncall_data(){
+    //     let options = {
+    //         url: vo_api_url + primary,
+    //         json: true,
+    //         headers: this.headers
+    //     };
+    //     return await request.get(options);
+    // }
+    // async get_secondary_oncall_data(){
+    //     let options = {
+    //         url: vo_api_url + secondary,
+    //         json: true,
+    //         headers: this.headers
+    //     };
+    //     return await request.get(options);
+    // }
+
+
+    async get_current_oncall_users(team){
         let users = [];
-        let pri_oncall_data = await this.get_primary_oncall_data();
+        let pri_oncall_data = await this.get_oncall_data(team);
         for (let schedule of pri_oncall_data.schedule){
             if ('overrideOnCall' in schedule){
                 users.push(schedule.overrideOnCall)

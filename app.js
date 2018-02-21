@@ -38,9 +38,10 @@ bot.startRTM((err,bot,payload) => {
     if (err) {
         throw new Error('Could not connect to Slack');
     }
-    updater.updater(bot, config, slack, vo);
+    let teams = config.teams;
+    updater.updater(bot, config, slack, vo, teams);
     setInterval(() => {
-        updater.updater(bot, config, slack, vo);
+        updater.updater(bot, config, slack, vo, teams);
     }, 10*60*1000)
 
 });

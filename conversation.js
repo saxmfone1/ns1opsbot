@@ -28,7 +28,6 @@ module.exports = (controller, slack, vo) => {
                     for (let user of group_list[group]) {
                         reply += "\t" + user + "\n";
                     }
-
                     bot.reply(message, reply);
                 }
             }
